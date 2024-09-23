@@ -10,9 +10,9 @@ A python Flask-based web server with basic functionality. To be used as the star
 
 ## Roadmap
 
-- [ ] Implement Basic GET/POST functionality of server
-- [ ] Integrate with a database
-- [ ] Implement user registration and session management
+- [x] Implement Basic GET/POST functionality of server
+- [x] Integrate with a database
+- [x] Implement user registration and session management
 - [ ] Add TLS certificate
 - [ ] A deploy script on a VPS
 
