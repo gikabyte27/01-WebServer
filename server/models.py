@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from server import db, login_manager
 from flask_login import UserMixin
+from flask_jwt_extended import create_access_token, decode_token
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -13,6 +14,24 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
+
+    def get_reset_token(self, expires_in=600):
+        reset_token = create_access_token(identity={'user_id': self.id},expires_delta=timedelta(seconds=expires_in))
+        return reset_token
+
+    @staticmethod
+    def verify_reset_token(token):
+        try:
+            decoded_token = decode_token(token)
+            identity = decoded_token.get('sub')
+            user_id = identity.get('user_id')
+            expiration_time = datetime.fromtimestamp(decoded_token['exp'])
+            found_user = User.query.get(user_id)
+            return expiration_time > datetime.utcnow(), found_user
+        except Exception as e:
+            print(f"Token verification failed: {str(e)}")
+            return False, None
+
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
